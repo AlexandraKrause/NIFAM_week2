@@ -1,0 +1,11 @@
+﻿Description;label;variable;distribution;lower;median;upper
+Knowledge_generating_cost;Knowledge generating cost (Dollar/Year);Knowldge_generating_cost;posnorm;1000;NA;4000
+Knowledge_spreading_benefit;Knowledge spreading benefit (Dollar/Year);Knowledge_spreading_benefit;posnorm;1000;NA;100000
+Knowledge_spreading_cost;Knowledge spreading cost (Dollar/Year);Knowledge_spreading_cost;posnorm;1000;NA;5000
+Health_benefit_lower_medical_costs;Health benefit of lower medical costs (Dollar/Year);Health_benefit_lower_medical_costs;posnorm;10000;NA;1000000
+Health_benefit_higher_ability_to_work;Health benefit higher ability to work (Euro/Year);Health_benefit_higher_ability_to_work;posnorm;10000;NA;1000000
+Coefficient of variation;Coefficient of variation;var_slight;const;1;NA;1
+Discout rate;Discount rate;discount_rate;const;1;NA;1
+Years of receiving;Receiving years;receiving_years;const;5;NA;5
+Years of paying;Paying years;paying_years;const;1;NA;1
+Risk;Risk of not being user friendly;Risk_UI_fail;const;0.01;;0.09
