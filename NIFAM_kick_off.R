@@ -11,9 +11,9 @@ library(tidyverse)
 
 ####Get data####
 
-input_table <-read.csv2("./Session-week2-example-csv.csv", dec = ",")
+input_estimates <-read.csv2("./Session-week2-example-csv.csv", dec = ",")
 
-input_table <- input_table %>% 
+input_estimates <- input_table %>% 
   mutate(Description = as.character(Description),
          label = as.character(label),
          variable = as.character(variable),
@@ -25,21 +25,21 @@ input_table <- input_table %>%
 ####
 #test if input table is loaded:
 
-input_table
+input_estimates
 ###
 
 decision_function <- function(x, varnames){
   
   #Risk
   Risk <- chance_event((1-Risk_UI_fail), 1, 0,
-                       n = (payout_months + investment_months))
-  
+                       n = (paying_years + receiving_years))
+############  
   #Knowledge generation
   
   Knowledge_generating_cost <- c(vv(var_mean = Knowldge_generating_cost, 
                                     var_CV = var_slight, 
                                     n = paying_years), rep(0,receiving_years))
-  
+###########
   #Knowledge spreading
   
   Knowledge_spreading_benefit <- c(rep(0,investment_months), 
@@ -56,98 +56,22 @@ decision_function <- function(x, varnames){
                                    n = paying_years), rep(0, receiving_years))
   
   Knowledge_spreading_cost <- Knowledge_spreading_cost * Risk
+  ######
   
-  #Health_benefit_lower_medical_costs
-  Health_benefit_lower_medical_costs <- c(vv(var_mean = Health_benefit_lower_medical_costs, 
+  #Health_benefit_medical_costs
+  Medical_costs <- c(vv(var_mean = Medical_costs, 
                                              var_CV = var_slight, 
                                              n = receiving_years))
   #Health_benefit_higher_ability_to_work
   
-  Health_benefit_higher_ability_to_work <- c(vv(var_mean = Health_benefit_higher_ability_to_work, 
-                                                var_CV = var_slight, 
-                                                n = receiving_years))
-  #no safety risk:
-  #SQ_Resources_investment <- SQ_Resources_investment * SQ_safety
+  Ability_to_work_health_benefit <- c(rep(0,investment_months), 
+                            vv(var_mean = Ability_to_work_health_benefit, 
+                                                        var_CV = var_slight, 
+                                                        n = receiving_years))
+    
+  #cheap population food choices
   
-  SQ_Resources_payout <- c(rep (0,investment_months),
-                           vv(var_mean = SQ_Resources_payout, 
-                              var_CV = var_slight, 
-                              n = payout_months))
-  
-  SQ_Resources_payout <- SQ_Resources_payout * SQ_safety
-  
-  #Empowerment Resources
-  #Agricultural Resources
-  Empowerment_Resources_investment <- c(vv(var_mean = 
-                                             Empowerment_Resources_investment, 
-                                           var_CV = var_slight, 
-                                           n = investment_months), 
-                                        rep(0,payout_months))
-  #no safety risk
-  
-  Empowerment_Resources_payout <- c(rep (0,investment_months),
-                                    vv(var_mean = Empowerment_Resources_payout, 
-                                       var_CV = var_slight, 
-                                       n = payout_months))
-  
-  Empowerment_Resources_payout <- Empowerment_Resources_payout * safety
-  
-  #Status quo monthly Workforce
-  
-  
-  SQ_Workforce_investment <- c( vv(var_mean = SQ_Workforce_investment, 
-                                   var_CV = var_slight, 
-                                   n = investment_months), 
-                                rep(0,payout_months))
-  
-  SQ_Workforce_investment <- SQ_Workforce_investment * SQ_safety
-  
-  SQ_Workforce_payout <- c(rep (0,investment_months),
-                           vv(var_mean = SQ_Workforce_payout, 
-                              var_CV = var_slight, 
-                              n = payout_months))
-  
-  SQ_Workforce_payout <- SQ_Workforce_payout * SQ_safety
-  
-  #Empowerment monthly Workforce
-  
-  
-  Empowerment_Workforce_investment <- c( vv(var_mean = 
-                                              Empowerment_Workforce_investment, 
-                                            var_CV = var_slight, 
-                                            n = investment_months), rep(0,payout_months))
-  
-  Empowerment_Workforce_investment <- Empowerment_Workforce_investment * safety
-  
-  Empowerment_Workforce_payout <- c(rep (0,investment_months),
-                                    vv(var_mean = Empowerment_Workforce_payout, 
-                                       var_CV = var_slight, 
-                                       n = payout_months))
-  
-  Empowerment_Workforce_payout <- Empowerment_Workforce_payout * safety
-  
-  # Husband's investment: Here, the wife is not paying herself.
-  # Instead, a husband is sharing his money with the family, including her, for
-  # the resources food and health care. Therefore, it is calculated as an 
-  # additional payoff.
-  
-  SQ_Husband_Workforce_investment <-  c(rep (0,investment_months),
-                                        vv(var_mean = 
-                                             SQ_Husband_Workforce_investment, 
-                                           var_CV = var_slight, 
-                                           n = payout_months))
-  
-  SQ_Husband_Workforce_investment <- SQ_Husband_Workforce_investment * SQ_safety
-  
-  
-  Husband_Empowerment_Workforce_investment <- c(rep (0,investment_months),
-                                                vv(var_mean = 
-                                                     Husband_Empowerment_Workforce_investment, 
-                                                   var_CV = var_slight, 
-                                                   n = payout_months))
-  
-  Husband_Empowerment_Workforce_investment <- 
-    Husband_Empowerment_Workforce_investment * safety
+  #theoretically also these....maybe...
   
   ### Explanation of the value varier function (vv())###
   
@@ -156,80 +80,23 @@ decision_function <- function(x, varnames){
   #var_mean is set as the initial variable that differs by var_CV, the coefficient
   #of variation, which is set within the input parameters.
   #n is the number of produced values, meaning the length of time for the
-  #initial variable var_mean, for example, "SQ_Husband_Workforce_investment."
-  #In this example, husbands also invest in their wives' health care and
-  #food supply. The investment duration is calculated to be three months until
-  #empowerment decision option payouts can be expected. So, n, in this case, is
-  #"investment_months." The "Empowerment_Workforce_payout" variable, representing
-  #the achieved outcome of the investment, on the other hand, contains
-  #n = payout_months.
-  #This is because the variable should vary around the nine months
-  #of the outcome and not the three months of investment.
+  #initial variable var_mean.
+  #This is because the variable should vary around the years
+  #of the outcome and not the year of investment.
   
   # Here, the coefficient of variation is set to 1 (var_cv = var_slight).
   
   ###Explanation of the chance_event function###
   
-  #The chance_event function (chance_event()) models a risk, here safety.
+  #The chance_event function (chance_event()) models a risk.
   #It is based on the binomial distribution 0 and 1, and randomly 
   #assigns values to each of the 10.000 model runs.
   #Two parts of the risk are present: One for the investment and one 
   #for the payout. This is considered because "n" is the number
   #of risk simulations and should differ between the three-month phase of 
   #investments and the nine-month phase of payouts.
-  #the "change" is the input parameter that defines the percentage of the risk to
-  #occur. Here it is set high at 50%. This calculation
-  #estimates empowerment as too risky for women half of the time.
-  #The risk is later applied to all elements independently. Social and 
-  #inner-household pressure can occur at each step of empowerment,
-  #ending the process. 
-  #The exclusion of this rule is investments into agricultural resources 
-  #and the workforce (health care and nutritious food
-  #resulting in increased work ability).
-  #It is unclear if women might keep the resources for themselves and have to 
-  #pay for their husbands to gather assets, but it is mostly seen
-  #as safe to buy them.
-  #Especially within the empowerment decision option, buying with her own money is 
-  #considered safer than other parts of the model.
-  
-  ##Risk explanation## 
-  #The husband might take all income possibilities away
-  #from the wive so that
-  #she loses complete control over farm income.
-  #The same risk occurs when the husband is not paying for 
-  #her food or health care, including pregnancy care and contraceptives.
-  #Especially in the case that she has some own land
-  #and therefore some income he might not contribute.
-  
-  
-  #Safety risks occur for all parts of payouts. 
-  #Having her own money and not giving it to her husband or family might
-  #also be a risk for violence. 
-  
-  
-  #Husband's investment into the food and health care (workforce investment)
-  #might be smaller within the empowerment decision option than the status quo
-  #decision option. 
-  #Also, like in the status quo scenario, it is not safe that the husband will
-  #invest.
-  
-  #It can be dangerous to use the money for herself instead of the family.
-  #Women might be dependent on their husbands for health care and food. 
-  #This calculation shows how much money a woman would, in the end
-  #have for health care and food investments (= workforce investment).
-  #A woman has no guarantee that her husband is paying for her food and health
-  #care. So there is a risk to this. Also, there is no guarantee that she is
-  #allowed to benefit from her investments in 
-  #agricultural resources and healthcare 
-  #(workforce) or if she has to give the money to her husband for his own 
-  #spending instead.
-  
-  #Investing in agricultural resources
-  #itself might be seen as threatening by men in some situations,
-  #but most literature describes it as a safe action,
-  #since the husband can keep the bought resources fully or partly to himself.
-  #In this scenario, it is seen as a safe action.
-  
+  #the "change" is the input parameter that defines the percentage of the
+  #risk to occur.
   
   
   ####Decision Option calculations####  
@@ -238,31 +105,22 @@ decision_function <- function(x, varnames){
   
   ##Status quo decision option##
   
-  PartA <- SQ_Workforce_payout
-  + SQ_Resources_payout
-  + SQ_Husband_Workforce_investment
-  
-  PartB <- SQ_Resources_investment + SQ_Workforce_investment
-  
-  Profit_SQ <- (PartA -PartB)
-  
+  Profit_SQ <- (Ability_to_work_health_benefit-Medical_costs)
   
   
   #Computing the Status Quo NPV (Net present value)#
   
-  NPV_no_empowerment_branch <- discount(Profit_SQ,
-                                        discount_rate = discount_rate, calculate_NPV = TRUE) 
+  NPV_no_intervention <- discount(Profit_SQ,
+                            discount_rate = discount_rate, calculate_NPV = TRUE) 
   
   ##Empowerment decision option##
   
-  PartA <- Economy_payout
-  + Empowerment_Resources_payout  
-  + Empowerment_Workforce_payout
-  + Husband_Empowerment_Workforce_investment
+  PartA <- Knowledge_spreading_benefit + Ability_to_work_health_benefit
+    
   
-  PartB <- Empowerment_Resources_investment + Education_investment 
-  + Economy_investment
-  + Empowerment_Workforce_investment
+  PartB <- Knowledge_generating_cost
+           +  Knowledge_spreading_cost
+           + Medical_costs
   
   
   Empowerment_profit <-  (PartA - PartB)
@@ -273,16 +131,17 @@ decision_function <- function(x, varnames){
   
   
   NPV_Empowerment_profit <- discount(Empowerment_profit,
-                                     discount_rate = discount_rate, calculate_NPV = TRUE)
+                                     discount_rate = discount_rate,
+                                     calculate_NPV = TRUE)
   NPV_decision_profit_with_Empowerment <- NPV_Empowerment_profit - 
-    NPV_no_empowerment_branch
+  NPV_no_intervention
   
   
   ####Return list####
   
   return(list(NPV_no_empowerment_branch =  NPV_no_empowerment_branch,
               NPV_Empowerment_profit = NPV_Empowerment_profit, 
-              NPV_decision_profit_with_Empowerment = NPV_decision_profit_with_Empowerment,
+    NPV_decision_profit_with_Empowerment = NPV_decision_profit_with_Empowerment,
               Cashflow_decision_empowerment =  Empowerment_profit
               
   )) 
@@ -311,15 +170,15 @@ mcSimulation_results <- decisionSupport::mcSimulation(
 
 #Plot empowerment decision option
 decisionSupport::plot_distributions(mcSimulation_object = mcSimulation_results, 
-                                    vars = c("NPV_decision_profit_with_Empowerment" ),
-                                    method = 'smooth_simple_overlay', 
-                                    base_size = 7)
+                              vars = c("NPV_decision_profit_with_Empowerment"),
+                              method = 'smooth_simple_overlay', 
+                               base_size = 7)
 #plot both
 decisionSupport::plot_distributions(mcSimulation_object = mcSimulation_results, 
-                                    vars = c("NPV_decision_profit_with_Empowerment",
-                                             "NPV_no_empowerment_branch"),
-                                    method = 'smooth_simple_overlay', 
-                                    base_size = 7)
+                                vars = c("NPV_decision_profit_with_Empowerment",
+                                         "NPV_no_empowerment_branch"),
+                                method = 'smooth_simple_overlay', 
+                                base_size = 7)
 
 #Plot distributions one by one
 decisionSupport::plot_distributions(mcSimulation_object = mcSimulation_results, 
@@ -327,8 +186,8 @@ decisionSupport::plot_distributions(mcSimulation_object = mcSimulation_results,
                                     method = 'boxplot_density')
 
 decisionSupport::plot_distributions(mcSimulation_object = mcSimulation_results, 
-                                    vars = "NPV_decision_profit_with_Empowerment",
-                                    method = 'boxplot_density')
+                                  vars = "NPV_decision_profit_with_Empowerment",
+                                  method = 'boxplot_density')
 
 ####Boxplots####
 
@@ -341,8 +200,8 @@ decisionSupport::plot_distributions(mcSimulation_object = mcSimulation_results,
 #'boxplot' empowerment decision option
 
 decisionSupport::plot_distributions(mcSimulation_object = mcSimulation_results, 
-                                    vars = c("NPV_decision_profit_with_Empowerment",
-                                             "NPV_no_empowerment_branch"
+                               vars = c("NPV_decision_profit_with_Empowerment",
+                                        "NPV_no_empowerment_branch"
                                     ),
                                     method = 'boxplot', 
                                     base_size = 7)
