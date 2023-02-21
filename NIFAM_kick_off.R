@@ -13,7 +13,7 @@ library(tidyverse)
 
 input_estimates <-read.csv2("./Session-week2-example-csv.csv", dec = ",")
 
-input_estimates <- input_table %>% 
+input_estimates <- input_estimates %>% 
   mutate(Description = as.character(Description),
          label = as.character(label),
          variable = as.character(variable),
@@ -139,7 +139,7 @@ decision_function <- function(x, varnames){
   
   ####Return list####
   
-  return(list(NPV_no_empowerment_branch =  NPV_no_empowerment_branch,
+  return(list(NPV_no_intervention=  NPV_no_intervention,
               NPV_Empowerment_profit = NPV_Empowerment_profit, 
     NPV_decision_profit_with_Empowerment = NPV_decision_profit_with_Empowerment,
               Cashflow_decision_empowerment =  Empowerment_profit
